@@ -1,137 +1,383 @@
-import numpy as np
-from sklearn.datasets import make_regression
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split, KFold, cross_val_score
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
+## Pandas - расширение NumPy (структурированные массивы). Строки и столбцы индексируются метками, а не тольк очисловыми значениями
+## Series, DataFrame, Index
 
-data = np.array(
-    [
-        [1, 5],
-        [2, 7],
-        [3, 7],
-        [4, 10],
-        [5, 11],
-        [6, 14],
-        [7, 17],
-        [8, 19],
-        [9, 22],
-        [10, 28]
-    ]
-)
+## Series
 
-# Градиентный спуск - пакетный градиентный спуск. Для работы используются
-# все обучающие данные. На практике используется стохастический градиентный спуск
-#  На каждой итерации обучаемся только на одной выборке из данных
+# data = pd.Series([0.25, 0.5, 0.75, 1.0])
+# print(data)
+# print(type(data))
 
-# - сокращение числа ввычислений
-#  - восим смещение -> боремся с переобучением
+# print(data.values)
+# print(data.index)
 
-# Мини-пакетный градиентный спуск
+# print(type(data.values))
+# print(type(data.index))
 
-# x = data[:,0]
-# y = data[:,1]
-# n = len(x)
-# w1, w0 = 0, 0
-# L = 0.001
+# data = pd.Series([0.25, 0.5, 0.75, 1.0])
+# print(data[0])
+# print(data[1:3])
 
-# sample_size = 3  # Размер выборки
-# iterations = 100_000
+# data = pd.Series([0.25, 0.5, 0.75, 1.0], index = ['a', 'b', 'c', 'd'])
+# print(data)
+# print(data['a'])
+# print(data['b':'d'])
 
-# for i in range(iterations):
-#     idx = np.random.choice(n, sample_size, replace= False)
-#     D_w0 = 2*(-y[idx] + w0 + w1 * x[idx]) 
-#     D_w1 = 2 * (x[idx] * (-y[idx] + w0 + w1*x[idx]))
-#     w0 -= L*D_w0
-#     w1 -= L*D_w1
+# print(data.index)
+# print(type(data.index))
 
-# print(sum(w1)/sample_size, sum(w0)/sample_size)
+# data = pd.Series([0.25, 0.5, 0.75, 1.0], index = [1, 10, 7, 'd'])
 
-# Как оценить, насколько сильно промахиваются прогнозы при использовании
-# линейной регрессии
+# print(data[1])
+# print(data[10: 'd'])
 
-# Для оценки степени взаимосвязи между двумя переменными мы использовали
-# линейный коэффициент корреляции
+# population_dict = {
+#     'city_1': 1000,
+#     'city_2': 1001,
+#     'city_3': 1002,
+#     'city_4': 1003,
+#     'city_5': 1004,
+#     'city_6': 1005,
+# }
 
-# data_df = pd.DataFrame(data)
-# print(data_df.corr(method='pearson'))
+# population = pd.Series(population_dict)
 
-# data_df[1] = data_df[1].values[::-1]
-# print(data_df.corr(method='pearson'))
+# print(population['city_4':'city_5'])
 
-# К-т корреляции помогает понять, есть ли связь между двумя переменными
+## Для создания Series можно использовать 
+# 1) Списки Python и массивы из Numpy
+# 2) Скалярные значения
+# 3) Словари
 
-# Обучающие и тестовые выборки
-# Основной метод борьбы с переобучением
-# Заключается в том, что набор данных делится на обучающую и тестовую выборки
+## Q1: Привести различные способы задания объектов типа  Series
 
-# Во всех видаз машинного обучения с учителем это встречается
+## DataFrame -- двумерный массив с явно определенными индексами. (Последовательность согласованныx по индексам объектов Series)
 
-# Обычная пропорция: 2/3 - обучение, 1/3 - на тест (4/5 и 1/5) (9/10 и 1/10)
+# area_dict = {
+#     'city_1': 10000,
+#     'city_2': 10010,
+#     'city_3': 10020,
+#     'city_4': 10030,
+#     'city_5': 10040,
+#     'city_6': 10050,
+# }
 
-# data_df = pd.DataFrame(data)
+# population_dict = {
+#     'city_1': 1000,
+#     'city_2': 1001,
+#     'city_3': 1002,
+#     'city_4': 1003,
+#     'city_5': 1004,
+#     'city_6': 1005,
+# }
 
-# # 3-кратная перекрестная валидация
-# kfold = KFold(n_splits= 3, random_state=1, shuffle=True)
+# population = pd.Series(population_dict)
+# area = pd.Series(area_dict)
 
-# X = data_df.values[:,:-1]
-# Y = data_df.values[:,1]
+# states = pd.DataFrame({
+#     'population': population,
+#     'area': area
+# })
 
-# # X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size=1/3)
+# print(states)
+# print(states.values)
+# print(states.index)
+# print(states.columns)
 
-# # print(X_train)
-# # print(Y_train)
+# print(type(states))
+# print(type(states.values))
+# print(type(states.index))
+# print(type(states.columns))
 
-# # print(X_test)
-# # print(Y_test)
+# print(states['area'])
 
-# model = LinearRegression()
-# # model.fit(X_train, Y_train)
+## Способы создания DataFrame 
+# 1) Через объекты Series
+# 2) Списки словарей
+# 3) Словари объектов Series
+# 4) Двумерный массив NumPy
+# 5) СТруктурированный массив NumPy
 
-# results = cross_val_score(model, X, Y, cv=kfold) # Перекреестная валидция
-# print(results) 
-# print(results.mean(), results.std())
-# К-т детерминации r^2
-# print(r**0.5)
+## Q2: Привести различные способы создания объектов типа DataFrame
 
-# Метрики показывают, насколько единообразно ведет себя модель
-# на разных выборках
+## Index -- способ организации ссылки на данные объектов Series и DataFrame. 
+# Index неизменяем, упорядочен, является мультимножеством (могут быть повторяющиеся значения)
 
-# Возмоно использование поэлементной перекрестной валидации 
-# (в случае, если мало данных)
-# Можно делать случайную валидацию
+# ind = pd.Index([2,3,5,7,11])
+# print(ind[1])
+# print(ind[::2])
 
-# Иногда часть выборки выделяют как валидационную выборку 
-# (сравнение различных моделей или конфигураций)
+# try:
+#     ind[1] = 5
+# except Exception as e:
+#     print(e)
 
+## Index следуюет соглашениям объекта типа set (Python)
 
-# Многомерная линейная регрессия
+# indA = pd.Index([1,2,3,4,5])
+# indB = pd.Index([2,3,4,5,6])
+# print(indA.intersection(indB))
 
-data_df = pd.read_csv('multiple_independent_variable_linear.csv')
+## Выборка данных из Series
 
-# print(data_df.head())
+# data = pd.Series([0.25, 0.5, 0.75, 1.0], index = ['a', 'b', 'c', 'd'])
 
-X = data_df.values[:,:-1]
-Y = data_df.values[:,-1]
+# print('a' in data)
+# print('z' in data)
 
-model = LinearRegression().fit(X, Y)
+# print(data.keys())
 
-print(model.coef_, model.intercept_)
+# print(list(data.items()))
 
-x1, x2= X[:, 0], X[:, 1]
-y = Y
+# data['a'] = 100
+# data['z'] = 1000
 
-fig = plt.figure()
-ax = plt.axes(projection='3d')
-ax.scatter3D(x1, x2, y)
+# print(data)
 
-x1_1 = np.linspace(min(x1), max(x1), 100)
-x2_1 = np.linspace(min(x2), max(x2), 100)
-X1_, X2_ = np.meshgrid(x1_1, x2_1)
-Y_ = model.intercept_ + model.coef_[0]*X1_ + model.coef_[1]*X2_
+## Объект типа Series как одномерный массив
 
-ax.plot_surface(X1_, X2_, Y_, cmap='Greys', alpha=0.5)
+# data = pd.Series([0.25, 0.5, 0.75, 1.0], index = ['a', 'b', 'c', 'd'])
 
-plt.show()
+# print(data['a':'c'])
+# print(data[0:2])
+# print(data[(data > 0.5) & (data < 1.0)])
+# print(data[['a', 'd']])
 
+## Аттрибуты-индексаторы
+
+# data = pd.Series([0.25, 0.5, 0.75, 1.0], index = [1, 3, 10, 15])
+
+# print(data[1])
+# 0
+# print(data.loc[1]) # значение ключа
+# print(data.iloc[1]) # порядковый номер ключа
+
+## Выборка данных из DataFrame
+
+## DataFrame Как словарь
+
+# area_dict = {
+#     'city_1': 10000,
+#     'city_2': 10010,
+#     'city_3': 10020,
+#     'city_4': 10030,
+#     'city_5': 10040,
+#     'city_6': 10050,
+# }
+
+# population_dict = {
+#     'city_1': 1000,
+#     'city_2': 1001,
+#     'city_3': 1002,
+#     'city_4': 1003,
+#     'city_5': 1004,
+#     'city_6': 1005,
+# }
+
+# population = pd.Series(population_dict)
+# area = pd.Series(area_dict)
+
+# data = pd.DataFrame({
+#     'popl': population,
+#     'pop': population,
+#     'area': area,
+# })
+
+# print(data['area'])
+# print(data.area)
+
+# print(data.popl is data['popl'])
+
+# data['new'] = data['area']
+
+# print(data)
+
+## DataFrame как двумерный массив
+
+# data = pd.DataFrame({
+#     'popl': population,
+#     'area': area,
+# })
+
+# print(data)
+# print(data.values)
+# print(data.T)
+
+# print(data['area'])
+# print(data.values[0:3])
+
+## Аттрибуты-индексаторы
+
+# data = pd.DataFrame({
+#     'popl': population,
+#     'pop': population,
+#     'area': area,
+# })
+
+# print(data)
+# print(data.iloc[:3, 1:2])
+# print(data.loc[:'city_4', 'popl':'pop'])
+# print(data.loc[data['pop'] > 1002, ['area','pop']])
+
+# data.iloc[0,2] = 9999
+# print(data)
+
+## Универсальные функции
+
+# rng = np.random.default_rng()
+# s = pd.Series(rng.integers(0,10,4))
+
+# print(s)
+# print(np.exp(s))
+
+# area = pd.Series({
+#     'city_1': 10000,
+#     'city_2': 10010,
+#     'city_13': 10020,
+#     'city_4': 10030,
+#     'city_15': 10040,
+#     'city_6': 10050,
+# })
+
+# population = pd.Series({
+#     'city_1': 1000,
+#     'city_12': 1001,
+#     'city_3': 1002,
+#     'city_4': 1003,
+#     'city_5': 1004,
+#     'city_16': 1005,
+# })
+
+# data = pd.DataFrame({
+#     'popl': population,
+#     'area': area,
+# })
+
+# print(data)
+
+## Q3: Объедените два объекта Series с неодинаковыми множествами ключей так, чтобы вместо Nan было установлено значение 1
+
+## Объединение DataFrame-ов
+
+# rng = np.random.default_rng()
+
+# dfA = pd.DataFrame(rng.integers(0,10, (2,2)), columns = ['a', 'b'])
+# dfB = pd.DataFrame(rng.integers(0,10, (3,3)), columns = ['a', 'b', 'c'])
+
+# print(dfA)
+# print()
+# print(dfB)
+# print()
+# print(dfA + dfB)
+
+rng = np.random.default_rng(1)
+
+A = rng.integers(0, 10, (3,4))
+
+# print(A)
+# print(A[0])
+
+# print(A - A[0])
+
+df = pd.DataFrame(A, columns = ['a', 'b', 'c', 'd'])
+
+# print(df)
+
+# print(df.iloc[0])
+
+# print(df - df.iloc[0])
+
+# print(df.iloc[0, ::2])
+
+# print(df - df.iloc[0, ::2])
+
+## Q3: Переписать пример с транслированием для DataFrame так, чтобы вычитание происходило не по строкам, а по столбцам
+
+# NA-значения: NaN, null, -99999999
+
+# sum / nansum обрабатывает Nan
+
+# Pandas. Два способа хранения отсутсвующих значений
+# 1) Индикаторы Nan, none
+# 2) null
+
+# None - объект, его использование может привести к накладным расходам
+# Не работает с агрегирующими операторами
+
+# val1 = np.array([1,2,3])
+# print(val1.sum())
+
+# try:
+#     val1 = np.array([1,None,3])
+#     print(val1.sum())
+# except:
+#     pass
+
+# val1 = np.array([1,np.nan,3])
+# print(val1)
+# print(val1.sum())
+# print(np.sum(val1))
+# print(np.nansum(val1))
+
+# NaN - числа
+
+# x = pd.Series(range(10), dtype=int)
+# print(x)
+
+# x[0] = None
+# x[1] = np.nan
+
+# print(x)
+
+# x1 = pd.Series(['a', 'b', 'c'])
+# print(x1)
+
+# x1[0] = None
+# x1[1] = np.nan
+
+# print(x1)
+
+## 
+
+# x2 = pd.Series([1,2,3, np.nan, None, pd.NA])
+# print(x2)
+
+# x3 = pd.Series([1,2,3, np.nan, None, pd.NA], dtype='Int32')
+# print(x3)
+
+# print(x3.isnull())
+# print(x3[x3.isnull()])
+# print(x3[x3.notnull()])
+
+# print(x3.dropna())
+
+# df = pd.DataFrame([
+#     [1,2,3, np.nan, None, pd.NA],
+#     [1,2,3,4,5,6],
+#     [1, np.nan,3,4, np.nan,6]
+# ])
+
+# print(df)
+# print()
+# print(df.dropna())
+# print()
+# print(df.dropna(axis=0))
+# print()
+# print(df.dropna(axis=1))
+
+# how
+# all - все значения NA
+# any - хотя бы одно значение NA
+
+# thresh=x -  остается, если присутсвует минимум x непустых значений
+
+# print(df.dropna(axis=1, how='all'))
+
+# print(df.dropna(axis=1, how='any'))
+
+# print(df.dropna(axis=1, thresh=2))
+
+## Q4: На примере DataFrame продемонстрируйте использование методов 

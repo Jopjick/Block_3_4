@@ -1,92 +1,302 @@
-# Наивная байессовская классификация
-# Набор моделей, которые предлагают быстрые и простые алгоритмы классификации
-# Первое приближенное решение задачи классификации
-
-# Гауссовский наивный байессовский классификатор
-# Допущение состоит в том, что данные всех категорий взяты из простого нормального распределения
-# Причем распределения независимы
-
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
-from sklearn.naive_bayes import GaussianNB
 
-iris = sns.load_dataset('iris')
-# print(iris.head())
+## ЕСли размерность данных > 2, используют иерархическую индексацию (мультииндекс). В один индекс влючаются несколько уровней
 
-# sns.pairplot(iris, hue='species')
+# index = [
+#     ('city_1', 2020, 1),
+#     ('city_1', 2020, 2),
+
+#     ('city_2', 2010, 1),
+#     ('city_2', 2010, 2),
+
+#     ('city_3', 2025, 1),
+#     ('city_3', 2025, 2),
+
+#     ('city_4', 2010, 1),
+#     ('city_4', 2010, 2),
+
+#     ('city_5', 2020, 1),
+#     ('city_5', 2020, 2),
+
+#     ('city_6', 2010, 1),
+#     ('city_6', 2010, 2)
+# ]
+
+# population = [101, 101, 123, 123, 105, 105, 110, 110, 101, 101, 123, 123]
+
+# pop = pd.Series(population, index = index, dtype='int16')
+
+# # print(pop)
+
+# # print(pop[ [i for i in pop.index if i[1] == 2020] ])
+
+# ## MultiIndex
+
+# index = pd.MultiIndex.from_tuples(index)
+
+# pop = pop.reindex(index)
+
+# print(pop)
+
+# # print(pop[:, 2020])
+
+# # pop_df = pop.unstack()
+# # print(pop_df)
+
+# # print(pop_df.stack())
 
 
-data = iris[['sepal_length', 'petal_length', 'species']]
+
+# index = [
+#     ('city_1', 2020, 1),
+#     ('city_1', 2020, 2),
+
+#     ('city_2', 2010, 1),
+#     ('city_2', 2010, 2),
+
+#     ('city_3', 2025, 1),
+#     ('city_3', 2025, 2),
+
+#     ('city_4', 2010, 1),
+#     ('city_4', 2010, 2),
+
+#     ('city_5', 2020, 1),
+#     ('city_5', 2020, 2),
+
+#     ('city_6', 2010, 1),
+#     ('city_6', 2010, 2)
+# ]
+
+# population = [101, 1010, 123, 1230, 105, 1050, 110, 1100, 101, 1010, 123, 1230]
+
+# index = pd.MultiIndex.from_tuples(index)
+
+# pop = pd.Series(population, index = index, dtype='int16')
+
+# # print(pop)
+
+# # print(pop[:,2010,:])
+# # print(pop[:,:,2])
+
+# pop_df = pop.unstack()
+
+# # print(pop_df)
+
+# pop_df = pd.DataFrame({'total': pop,
+#     'something':[i+10 for i in range(12)]})
+
+# # print(pop_df)
+
+# # print(pop_df['something'])
+
+# # pop_df_1 = pop_df.loc['city_1', 'something']
+# # pop_df_2 = pop_df.loc[['city_1', 'city_4'], ['something', 'total']]
+
+# # print(pop_df_1)
+# # print(pop_df_2)
+
+# ## Как можно создавать мультииндексы?
+
+# ## 1) Список массивов, задающих значения индекса на каждом уровне
+
+# i1 = pd.MultiIndex.from_arrays([
+#     ['a', 'a', 'b', 'b'],
+#     [1,2,1,2]
+# ])
+
+# print(i1)
+
+# ## 2) Список кортежей, задающих значение индекса в каждой точке
+
+# i2 = pd.MultiIndex.from_tuples([
+#     ('a', 1),
+#     ('a', 2),
+#     ('b', 1),
+#     ('b', 2),
+# ])
+
+# print(i2)
+
+##  3) Декартово произведение обычных индексов
+
+# i3 = pd.MultiIndex.from_product([
+#     ['a', 'b'],
+#     [1,2]
+# ])
+
+# print(i3)
+
+## 4) Описание внутреннего представления: levels - список списков
+## codes - список списков меток
+
+# i4 = pd.MultiIndex(
+#     levels = [
+#         ['a', 'b', 'c'],
+#         [1,2]
+#     ],
+#     codes = [
+#         [0, 0, 1, 1, 2, 2], # a a b b c c
+#         [0, 1, 0, 1, 0, 1]] # 1 2 1 2 1 2
+# )
+
+# print(i4)
+
+## уровням можно давать названия
+
+# data = {
+#     ('city_1', 2010): 100,
+#     ('city_2', 2020): 200,
+#     ('city_1', 2010): 1001,
+#     ('city_2', 2020): 2001,
+# }
+
+# s = pd.Series(data)
+# print(s)
+# print()
+
+# s.index.names = ['city', 'year']
+# print(s)
+
+# index = pd.MultiIndex.from_product([
+#     ['city_a', 'city_b'],
+#     [1000,2000]
+#     ],
+#     names = ['city', 'year']
+# )
+
+# # print(index)
+
+# columns = pd.MultiIndex.from_product([
+#     ['pers_a', 'pers_b', 'pers_c'],
+#     ['job_1', 'job_2']
+#     ],
+#     names = ['worker', 'job']
+# )
+
+# rng = np.random.default_rng(1)
+
+# data = rng.random((4,6))
+# # print(data)
+
+# data_df = pd.DataFrame(data, index = index, columns = columns)
+
+# print(data_df)
+
+## Индексация и срезы (по мультииндексу)
+
+# data = {
+#     ('city_1', 2010): 100,
+#     ('city_2', 2020): 200,
+#     ('city_1', 2010): 1001,
+#     ('city_2', 2020): 2001,
+#     ('city_3', 2010): 1001,
+#     ('city_3', 2020): 2001,
+# }
+
+# s = pd.Series(data)
+# s.index.names = ['city', 'year']
+
+# # print(s['city_1', 2010])
+# # print(s['city_1'])
+
+# # print(s.loc['city_1':'city_2'])
+
+# # print(s[:, 2010])
+
+# # print(s[s>2000])
+
+# print(s['city_1':'city_2'])
+
+## Перегруппировка по мультииндексу
+
+rng = np.random.default_rng(1)
+
+# index = pd.MultiIndex.from_product([
+#     ['a', 'c', 'b'],
+#     [1,2]
+# ])
+
+# data = pd.Series(rng.random(6), index = index)
+# data.index.names = ['char', 'int']
+
 # print(data)
+# # print(data['a':'b'])
 
-# setosa / versicolor
+# data = data.sort_index()
 
-data_df = data[(data['species'] == 'setosa') | (data['species'] == 'versicolor')]
-X = data_df[['sepal_length', 'petal_length']] 
-Y = data_df['species'] # Метки
-# print(data_df.shape)
-# sns.pairplot(data_df, hue='species')
+# print(data['a':'b'])
 
-model = GaussianNB()
-model.fit(X, Y)
+## Индексы должны быть отсортированы
 
-print(model.theta_[0]) # Мат ожидание
-print(model.var_[0]) # Дисперсия
+# index = [
+#     ('city_1', 2020, 1),
+#     ('city_1', 2020, 2),
 
-print(model.theta_[1])
-print(model.var_[1])
+#     ('city_2', 2010, 1),
+#     ('city_2', 2010, 2),
 
-theta_0, theta_1 = model.theta_[0], model.theta_[1]
-var_0, var_1 = model.var_[0], model.var_[1]
+#     ('city_3', 2025, 1),
+#     ('city_3', 2025, 2),
 
+#     ('city_4', 2010, 1),
+#     ('city_4', 2010, 2),
 
+#     ('city_5', 2020, 1),
+#     ('city_5', 2020, 2),
 
-data_df_setosa = data_df[data_df['species']=='setosa']
-data_df_versicolor = data_df[data_df['species']=='versicolor']
+#     ('city_6', 2010, 1),
+#     ('city_6', 2010, 2)
+# ]
 
-# plt.scatter(data_df_setosa['sepal_length'], data_df_setosa['petal_length'])
-# plt.scatter(data_df_versicolor['sepal_length'], data_df_versicolor['petal_length'])
+# population = [101, 1010, 123, 1230, 105, 1050, 110, 1100, 101, 1010, 123, 1230]
 
-x1_p = np.linspace(min(data_df['sepal_length']), max(data_df['sepal_length']), 400)
-x2_p = np.linspace(min(data_df['petal_length']), max(data_df['petal_length']), 400)
+# pop = pd.Series(population, index = index)
 
-# Подготовка данных
+# print(pop)
 
-# Создание пар
-X1_p, X2_p = np.meshgrid(x1_p, x2_p)
+# i = pd.MultiIndex.from_tuples(index)
 
-# Подготовка данных комбинаций признаков
-X_p = pd.DataFrame(np.vstack([X1_p.ravel(), X2_p.ravel()]).T,
-                   columns=['sepal_length', 'petal_length'])
+# pop = pop.reindex(i)
 
-Z1 = 1 / (1*np.pi*(var_0[0]*var_0[1])**0.5) * np.exp(-0.5*(X1_p - theta_0[0])**2/var_0[0] - 0.5*(X2_p - theta_0[1])**2/var_0[1])
-Z2 = 1 / (1*np.pi*(var_1[0]*var_1[1])**0.5) * np.exp(-0.5*(X1_p - theta_1[0])**2/var_1[0] - 0.5*(X2_p - theta_1[1])**2/var_1[1])
-plt.contour(X1_p, X2_p, Z1)
-plt.contour(X1_p, X2_p, Z2)
+# print(pop)
 
-# print(X_p.head())
-# Предсказание
-Y_p = model.predict(X_p)
-X_p['species'] = Y_p
+# print(pop.unstack())
 
-X_p_setosa = X_p[X_p['species']=='setosa']
-X_p_versicolor = X_p[X_p['species']=='versicolor']
-cls = [(0.2, 0.4, 0.5), (0.6, 0.4, 0.2)]
-plt.scatter(X_p_setosa['sepal_length'], X_p_setosa['petal_length'], linewidths=5, alpha=0.2, color=cls[0])
-plt.scatter(X_p_versicolor['sepal_length'], X_p_versicolor['petal_length'], linewidths=5, alpha=0.2, color=cls[1])
-plt.scatter(data_df_setosa['sepal_length'], data_df_setosa['petal_length'])
-plt.scatter(data_df_versicolor['sepal_length'], data_df_versicolor['petal_length'])
+# print(pop.unstack(level = 0))
 
+# print(pop.unstack(level = 1))
 
-fig = plt.figure()
-ax = plt.axes(projection='3d')
-ax.contour3D(X1_p, X2_p, Z1, levels=200)
-ax.contour3D(X1_p, X2_p, Z2, levels=100)
-# setosa / verginica
+## NumPy Конкатенация
 
+x = [[1,2,3]]
+y = [[4,5,6]]
+z = [[7,8,9]]
 
-plt.show()
+# print(np.concatenate([x,y,z]))
 
+# print(np.concatenate([x,y,z], axis = 1))
+# print(np.concatenate([x,y,z], axis = 0))
 
+## Pandas - concat
+
+# ser1 = pd.Series(['a', 'b', 'c'], index = [1,2,3])
+# ser2 = pd.Series(['d', 'e', 'f'], index = [4,5,6])
+
+# # print(pd.concat([ser1, ser2]))
+
+# ser1 = pd.Series(['a', 'b', 'c'], index = [1,2,3])
+# ser2 = pd.Series(['d', 'e', 'f'], index = [1,2,6])
+
+# print(pd.concat([ser1, ser2]))
+
+# print(pd.concat([ser1, ser2], verify_integrity=False))
+# print(pd.concat([ser1, ser2], ignore_index=True))
+
+# print(pd.concat([ser1, ser2], keys= ['x', 'y']))
+
+# ser1 = pd.Series(['a', 'b', 'c'], index = [1,2,3])
+# ser2 = pd.Series(['b', 'c', 'f'], index = [3,2,6])
+
+# print(pd.concat([ser1, ser2], join='outer'))
+# print(pd.concat([ser1, ser2], join='inner'))
